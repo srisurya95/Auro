@@ -1,10 +1,14 @@
 package com.architjn.acjmusicplayer.ui.layouts.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -17,13 +21,16 @@ import android.transition.Fade;
 import android.transition.Transition;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import com.architjn.acjmusicplayer.R;
-import com.architjn.acjmusicplayer.elements.adapters.AlbumSongAdapter;
-import com.architjn.acjmusicplayer.elements.items.SongListItem;
+import com.architjn.acjmusicplayer.utils.Mood;
+import com.architjn.acjmusicplayer.utils.adapters.AlbumSongAdapter;
+import com.architjn.acjmusicplayer.utils.items.SongListItem;
 import com.architjn.acjmusicplayer.service.MusicService;
 import com.squareup.picasso.Picasso;
 
@@ -38,19 +45,45 @@ public class AlbumActivity extends AppCompatActivity {
     private FloatingActionButton fab;
     private String imagePath;
     private ImageView albumArt;
+    private CollapsingToolbarLayout collapsingToolbarLayout;
+    private SharedPreferences settingsPref;
     private ArrayList<SongListItem> songList = new ArrayList<>();
     private ArrayList<String> songName, songArtist, songPath,
             songAlbum, songId, songAlbumId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        settingsPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        if (settingsPref.getBoolean("pref_album_status_trans", true)) {
+            if (Build.VERSION.SDK_INT >= 21)
+                getWindow().setStatusBarColor(Color.TRANSPARENT);
+        } else {
+            if (Build.VERSION.SDK_INT >= 21) {
+                Window w = getWindow();
+                w.setFlags(
+                        WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+                        WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            }
+        }
+
+        if (settingsPref.getBoolean("pref_album_nav_trans", false)) {
+            if (Build.VERSION.SDK_INT >= 21) {
+                getWindow().getDecorView().setSystemUiVisibility(
+                        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+                getWindow().setNavigationBarColor(Color.TRANSPARENT);
+            }
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album);
         overridePendingTransition(0, 0);
-        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout)
+        collapsingToolbarLayout = (CollapsingToolbarLayout)
                 findViewById(R.id.collapsingtoolbarlayout_album);
         if (collapsingToolbarLayout != null)
             collapsingToolbarLayout.setTitle(getIntent().getStringExtra("albumName"));
+        collapsingToolbarLayout.setStatusBarScrimColor(
+                getAutoStatColor(((ColorDrawable) collapsingToolbarLayout.getContentScrim()).getColor()));
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_album);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -158,12 +191,6 @@ public class AlbumActivity extends AppCompatActivity {
     }
 
     private void setSongList() {
-//        songName = new ArrayList<>();
-//        songAlbum = new ArrayList<>();
-//        songPath = new ArrayList<>();
-//        songId = new ArrayList<>();
-//        songAlbumId = new ArrayList<>();
-//        songArtist = new ArrayList<>();
         System.gc();
         Cursor musicCursor;
 
@@ -196,13 +223,7 @@ public class AlbumActivity extends AppCompatActivity {
                         musicCursor.getString(pathColumn), false,
                         musicCursor.getLong(albumIdColumn),
                         musicCursor.getString(albumNameColumn),
-                        count));
-//                songName.add(musicCursor.getString(titleColumn));
-//                songArtist.add(musicCursor.getString(artistColumn));
-//                songPath.add(musicCursor.getString(pathColumn));
-//                songAlbum.add(musicCursor.getString(albumNameColumn));
-//                songId.add(musicCursor.getLong(idColumn) + "");
-//                songAlbumId.add(musicCursor.getLong(albumIdColumn) + "");
+                        count, Mood.UNKNOWN));
             }
             while (musicCursor.moveToNext());
         }
@@ -231,5 +252,12 @@ public class AlbumActivity extends AppCompatActivity {
     public void onBackPressed() {
         fab.setVisibility(View.GONE);
         super.onBackPressed();
+    }
+
+    public int getAutoStatColor(int baseColor) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(baseColor, hsv);
+        hsv[2] *= 0.8f;
+        return Color.HSVToColor(hsv);
     }
 }

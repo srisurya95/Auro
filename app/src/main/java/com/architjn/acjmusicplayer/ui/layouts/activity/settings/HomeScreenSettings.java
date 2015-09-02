@@ -3,7 +3,6 @@ package com.architjn.acjmusicplayer.ui.layouts.activity.settings;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -17,7 +16,6 @@ import com.architjn.acjmusicplayer.R;
 public class HomeScreenSettings extends PreferenceActivity {
 
     private SharedPreferences shp;
-    private Preference extendTabs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,17 +30,6 @@ public class HomeScreenSettings extends PreferenceActivity {
         bar.setBackgroundColor(shp.getInt("amp_actionbar", getResources().getColor(R.color.ColorPrimary)));
         root.addView(bar, 0);
 
-        setIds();
-
-        setListeners();
-
-    }
-
-    private void setIds() {
-        extendTabs = findPreference("pref_extend_tabs");
-    }
-
-    private void setListeners() {
     }
 
 }

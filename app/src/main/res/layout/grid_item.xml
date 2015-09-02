@@ -3,13 +3,15 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@color/card_background"
-    android:drawSelectorOnTop="true">
+    android:drawSelectorOnTop="true"
+    android:foreground="?android:attr/selectableItemBackground">
 
     <RelativeLayout
         android:id="@+id/real_background"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="@color/card_background">
+        android:background="@color/card_background"
+        android:foreground="?android:attr/selectableItemBackground">
 
         <ImageView
             android:id="@+id/grid_art"

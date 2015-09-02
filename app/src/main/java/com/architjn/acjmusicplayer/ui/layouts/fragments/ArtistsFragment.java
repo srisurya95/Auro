@@ -16,9 +16,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.architjn.acjmusicplayer.R;
-import com.architjn.acjmusicplayer.elements.SpacesItemDecoration;
-import com.architjn.acjmusicplayer.elements.adapters.ArtistAdapter;
-import com.architjn.acjmusicplayer.elements.items.ArtistListItem;
+import com.architjn.acjmusicplayer.utils.SpacesItemDecoration;
+import com.architjn.acjmusicplayer.utils.adapters.ArtistAdapter;
+import com.architjn.acjmusicplayer.utils.items.ArtistListItem;
 
 import java.util.ArrayList;
 
@@ -82,11 +82,12 @@ public class ArtistsFragment extends Fragment {
             while (musicCursor.moveToNext());
         }
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(mainView.getContext(), 2);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(mainView.getContext(),
+                settingsPref.getInt("pref_grid_num", 2));
         gridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         gridLayoutManager.scrollToPosition(0);
         gv.setLayoutManager(gridLayoutManager);
-        gv.addItemDecoration(new SpacesItemDecoration(8));
+        gv.addItemDecoration(new SpacesItemDecoration(8, settingsPref.getInt("pref_grid_num", 2)));
         gv.setHasFixedSize(true);
         gv.setAdapter(new ArtistAdapter(mainView.getContext(), albumList));
         gv.setOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -94,15 +95,6 @@ public class ArtistsFragment extends Fragment {
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 currentFabPos = dy;
-//                if (dy > currentFabPos) {
-//                    if (fab.getVisibility() == View.GONE) {
-//                        fab.setVisibility(View.VISIBLE);
-//                    }
-//                } else if (dy < currentFabPos) {
-//                    if (fab.getVisibility() == View.VISIBLE) {
-//                        fab.setVisibility(View.GONE);
-//                    }
-//                }
             }
         });
     }
